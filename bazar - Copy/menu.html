@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beranda - Bazar XI RPL-2</title>
+    <link rel="icon" href="bendera-removebg-preview.png">
+
+    <!-- CSS Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .cart-badge {
+            position: relative;
+        }
+        .cart-badge::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+        header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #555;
+            border-radius: 5px;
+        }
+
+        .cta {
+            background-color: #f39c12;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .cta:hover {
+            background-color: #e67e22;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-fuchsia-800 text-fuchsia-100 p-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-4">
+            <img src="bendera-removebg-preview.png" alt="Bazar Logo" class="w-12 h-12 rounded-full">
+            <h1 class="text-lg font-bold sm:text-xl">Bazar - XI RPL-2</h1>
+        </div>
+        <div class="flex items-center md:hidden">
+            <button id="menu-toggle" class="text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </div>
+        <nav class="hidden md:flex space-x-4">
+            <a href="beranda1.html" class="hover:text-fuchsia-200">Beranda</a>
+            <a href="menu.html" class="hover:text-fuchsia-200">Menu</a>
+            <button id="cart-button" class="cart-badge bg-fuchsia-500 hover:bg-fuchsia-600 text-white px-4 py-2 rounded-full" data-count="0">
+                🛒 Keranjang
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden hidden">
+        <nav class="flex flex-col space-y-2 p-4 bg-fuchsia-800 text-white">
+            <a href="beranda1.html" class="hover:text-fuchsia-200">Beranda</a>
+            <a href="menu.html" class="hover:text-fuchsia-200">Menu</a>
+            <button id="cart-button-mobile" class="cart-badge bg-fuchsia-500 hover:bg-fuchsia-600 text-white px-4 py-2 rounded-full" data-count="0">
+                🛒 Keranjang
+            </button>
+        </nav>
+    </div>
+
+    <!-- Menu Container -->
+    <main class="bg-fuchsia-100">
+        <div class="container mx-auto px-4 py-8">
+            <h2 class="text-3xl font-bold text-center mb-8 text-fuchsia-800">Menu Kami</h2>
+            
+            <div id="menu-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Menu items akan dimasukkan secara dinamis -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" async></script>
+
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        }); 
+
+        class MenuManager {
+            constructor() {
+                this.menuItems = [
+                    {
+                        id: 'es_kopi',
+                        name: 'Es Kopi Milo',
+                        price: 5000,
+                        description: 'Hotdog lezat dengan sosis premium dan saus istimewa',
+                        image: 'es_kopi_milo.png'
+                    },
+                    {
+                        id: 'nasi_padang',
+                        name: 'Nasi Padang',
+                        price: 15000,
+                        description: 'Burger besar dengan daging pilihan dan sayuran segar',
+                        image: 'nasi_padang.png'
+                    },
+                    {
+                        id: 'es_tebak',
+                        name: 'Es Tebak',
+                        price: 10000,
+                        description: 'Churros enak dengan keju yang lezat',
+                        image: 'es_tebak.png'
+                    },
+                    {
+                        id: 'lemon',
+                        name: 'Lemon Ice',
+                        price: 25000,
+                        description: 'Burger besar dengan daging pilihan dan sayuran segar',
+                        image: 'lemon.jpg'
+                    },
+                    // Tambahkan menu lainnya
+                ];
+                this.cart = new Cart();
+                this.renderMenu();
+            }
+
+            renderMenu() {
+                const menuContainer = document.getElementById('menu-container');
+                menuContainer.innerHTML = this.menuItems.map(item => this.createMenuCard(item)).join('');
+                this.setupMenuInteractions();
+            }
+
+            createMenuCard(item) {
+                return `
+                    <div class="menu-card bg-fuchsia-100 shadow-lg rounded-lg overflow-hidden transform transition hover:scale-105" 
+                        data-id="${item.id}" 
+                        data-name="${item.name}" 
+                        data-price="${item.price}">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-80 object-cover">
+                        <div class="p-4 bg-fuchsia-100">
+                            <h3 class="text-xl font-bold text-green-800 mb-2">${item.name}</h3>
+                            <p class="text-gray-600 mb-4">${item.description}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-green-700 font-bold">Rp${item.price.toLocaleString()}</span>
+                                <div class="flex items-center space-x-2">
+                                    <button class="btn-kurang bg-green-500 text-white px-2 py-1 rounded">-</button>
+                                    <input type="number" class="item-quantity w-12 text-center border rounded" value="0" min="0" readonly>
+                                    <button class="btn-tambah bg-green-500 text-white px-2 py-1 rounded">+</button>
+                                </div>
+                            </div>
+                            <button class="btn-keranjang w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700">
+                                Tambah ke Keranjang
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setupMenuInteractions() {
+                document.querySelectorAll('.menu-card').forEach(card => {
+                    const btnTambah = card.querySelector('.btn-tambah');
+                    const btnKurang = card.querySelector('.btn-kurang');
+                    const inputQuantity = card.querySelector('.item-quantity');
+                    const btnKeranjang = card.querySelector('.btn-keranjang');
+
+ btnTambah.addEventListener('click', () => {
+                        inputQuantity.value = Math.min(10, parseInt(inputQuantity.value) + 1);
+                    });
+
+                    btnKurang.addEventListener('click', () => {
+                        inputQuantity.value = Math.max(0, parseInt(inputQuantity.value) - 1);
+                    });
+
+                    btnKeranjang.addEventListener('click', () => {
+                        const quantity = parseInt(inputQuantity.value);
+                        if (quantity > 0) {
+                            const item = {
+                                id: card.dataset.id,
+                                name: card.dataset.name,
+                                price: parseInt(card.dataset.price),
+                                quantity: quantity
+                            };
+                            this.cart.addItem(item);
+                            inputQuantity.value = 0;
+                        }
+                    });
+                });
+            }
+        }
+
+        class Cart {
+            constructor() {
+                this.items = JSON.parse(localStorage.getItem('cart-items')) || [];
+                this.cartButton = document.getElementById('cart-button');
+                this.cartButtonMobile = document.getElementById('cart-button-mobile');
+                this.setupCartButton();
+                this.updateCartBadge();
+            }
+
+            setupCartButton() {
+                this.cartButton.addEventListener('click', () => this.showCart());
+                this.cartButtonMobile.addEventListener('click', () => this.showCartMO());
+            }
+
+            addItem(item) {
+                const existingItemIndex = this.items.findIndex(i => i.id === item.id);
+                
+                if (existingItemIndex > -1) {
+                    this.items[existingItemIndex].quantity += item.quantity;
+                } else {
+                    this.items.push(item);
+                }
+
+                this.saveCart();
+                this.updateCartBadge();
+                this.showAddToCartNotification(item);
+            }
+
+            showAddToCartNotification(item) {
+                const isMobile = window.innerWidth < 768; // Check if the screen width is less than 768px
+                if (isMobile) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Ditambahkan ke Keranjang',
+                        text: `${item.name} (${item.quantity}) telah ditambahkan`,
+                        toast: true,
+                        position: 'top-end',
+                        width: '500px',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Ditambahkan ke Keranjang',
+                        text: `${item.name} (${item.quantity}) telah ditambahkan`
+                    });
+                }
+            }
+
+            saveCart() {
+                localStorage.setItem('cart-items', JSON.stringify(this.items));
+            }
+
+            updateCartBadge() {
+                const totalItems = this.items.reduce((total, item) => total + item.quantity, 0);
+                this.cartButton.setAttribute('data-count', totalItems);
+                this.cartButtonMobile.setAttribute('data-count', totalItems);
+            }
+
+            showCart() {
+                if (this.items.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Keranjang Kosong',
+                        text: 'Silakan tambahkan item terlebih dahulu'
+                    });
+                    return;
+                }
+
+                const cartContent = this.generateCartHTML();
+                Swal.fire({
+                    title: 'Keranjang Belanja',
+                    html: cartContent,
+                    showCancelButton: true,
+                    confirmButtonText: 'Checkout',
+                    cancelButtonText: 'Tutup',
+                    width: '800px',
+                    didRender: () => {
+                        this.setupCartItemActions();
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.checkout();
+                    }
+                });
+            }
+
+            showCartMO() {
+                if (this.items.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Keranjang Kosong',
+                        text: 'Silakan tambahkan item terlebih dahulu'
+                    });
+                    return;
+                }
+
+                const cartContent = this.generateCartHTMLMO();
+                Swal.fire({
+                    title: 'Keranjang Belanja',
+                    html: cartContent,
+                    showCancelButton: true,
+                    confirmButtonText: 'Checkout',
+                    cancelButtonText: 'Tutup',
+                    width: '800px',
+                    didRender: () => {
+                        this.setupCartItemActions();
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.checkout();
+                    }
+                });
+            }
+
+            setupCartItemActions() {
+                document.querySelectorAll('.btn-hapus-item').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const itemId = e.target.dataset.id;
+                        this.removeItem(itemId);
+                        this.showCart(); // Refresh cart view
+                    });
+                });
+
+                document.querySelectorAll('.btn-ubah-qty').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const itemId = e.target.dataset.id;
+                        const change = parseInt(e.target.dataset.change);
+                        this.updateItemQuantity(itemId, change);
+                        this.showCart(); // Refresh cart view
+                    });
+                });
+            }
+
+            updateItemQuantity(itemId, change) {
+                const itemIndex = this.items.findIndex(item => item.id === itemId);
+                if (itemIndex > -1) {
+                    this.items[itemIndex].quantity = Math.max(0, this.items[itemIndex].quantity + change);
+                    
+                    if (this.items[itemIndex].quantity === 0) {
+                        this.items.splice(itemIndex, 1);
+                    }
+                    
+                    this.saveCart();
+                    this.updateCartBadge();
+                }
+            }
+
+            generateCartHTML() {
+                const totalHarga = this.calculateTotal();
+                const itemsHTML = this.items.map(item => `
+                    <div class="flex justify-between items-center mb-2 p-2 bg-green-100 rounded">
+                        <div class="flex-grow">
+                            <span class="font-bold">${item.name}</span>
+                            <span class="text-gray-600 ml-2">Rp${item.price.toLocaleString()} x ${item.quantity}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="btn-ubah-qty bg-green-500 text-white px-2 py-1 rounded" 
+                                    data-id="${item.id}" data-change="-1">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="btn-ubah-qty bg-green-500 text-white px-2 py-1 rounded" 
+                                    data-id="${item.id}" data-change="1">+</button>
+                        </div>
+                        <span class="font-bold ml-4">Rp${(item.price * item.quantity).toLocaleString()}</span>
+                        <button class="btn-hapus-item bg-red-500 text-white px-2 py-1 rounded ml-2" 
+                                data-id="${item.id}">Hapus</button>
+                    </div>
+                `).join('');
+
+                return `
+                    <div>
+                        ${itemsHTML}
+                        <hr class="my-3">
+                        <div class="flex justify-between font-bold text-xl">
+                            <span>Total:</span>
+                            <span>Rp${totalHarga.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            generateCartHTMLMO() {
+                const totalHarga = this.calculateTotal();
+                const itemsHTML = this.items.map(item => `
+                    <div class="flex justify-between items-center mb-2 p-2 bg-green-100 rounded w-auto h-auto">
+                        <div class="flex-grow">
+                            <span class="font-bold text-sm">${item.name}</span>
+                            <span class="text-gray-600 ml-2 text-xs">Rp${item.price.toLocaleString()} x ${item.quantity}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="btn-ubah-qty bg-green-500 text-white px-2 text-sm py-1 rounded" 
+                                    data-id="${item.id}" data-change="-1">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="btn-ubah-qty bg-green-500 text-white px-2 text-sm py-1 rounded" 
+                                    data-id="${item.id}" data-change="1">+</button>
+                        </div>
+                        
+                        <span class="text-xs font-bold ml-2">Rp${(item.price * item.quantity).toLocaleString()}</span>
+                        <button class="btn-hapus-item bg-red-500 text-white text-xs px-1 py-1/2 rounded ml-1/2" 
+                                data-id="${item.id}">Hapus</button>
+                    </div>
+                `).join('');
+
+                return `
+                    <div>
+                        ${itemsHTML}
+                        <hr class="my-3">
+                        <div class="flex justify-between font-bold text-xs">
+                            <span class="text-sm">Total:</span>
+                            <span>Rp${totalHarga.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateTotal() {
+                return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+            }
+
+            removeItem(itemId) {
+                this.items = this.items.filter(item => item.id !== itemId);
+                this.saveCart();
+                this.updateCartBadge();
+            }
+
+            checkout() {
+                Swal.fire({
+                    title: 'Pilih Metode Pembayaran',
+                    html: this.generatePaymentMethodsHTML(),
+                    showCancelButton: true,
+                    showConfirmButton: false,
+                    cancelButtonText: 'Batal',
+                    didRender: () => {
+                    this.setupPaymentMethodListeners();
+                    }
+                });
+            }
+
+            generatePaymentMethodsHTML() {
+                const paymentMethods = [
+                    { method: 'qris', label: 'Qris', color: 'yellow' },
+                    { method: 'cod', label: 'Bayar ditempat', color: 'red' }
+                ];
+
+                return `
+                    <div class="space-y-4">
+                        ${paymentMethods.map(method => `
+                            <button class="payment-method w-full bg-${method.color}-500 text-white py-2 rounded" 
+                                    data-method="${method.method}">
+                                ${method.label}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            setupPaymentMethodListeners() {
+                document.querySelectorAll('.payment-method').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const paymentMethod = e.target.dataset.method;
+                        this.processPayment(paymentMethod);
+                    });
+                });
+            }
+
+            processPayment(method) {
+                const pesananItems = this.items.map(item => 
+                    `${item.name} (${item.quantity}x) - Rp${(item.price * item.quantity).toLocaleString()}`
+                ).join('%0A');
+                
+                const totalHarga = this.calculateTotal();
+                
+                let paymentMessage = `Metode Pembayaran: ${this.getPaymentMethodName(method)}%0A%0APesanan:%0A${pesananItems}%0A%0ATotal: Rp${totalHarga.toLocaleString()}`;
+                
+                switch(method) {
+                    case 'qris':
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Pembayaran Qris',
+                            html: `
+                                <p>Silahkan Screenshot/Download QR Code berikut:</p>
+                                <a href="website-pa-sohe/qris-qr.png" download>
+                                    <img src="website-pa-sohe/qris-qr.png" alt="Qris QR Code" class="mx-auto w-full h-auto">
+                                </a>
+                            `,
+                            confirmButtonText: 'Konfirmasi Pembayaran'
+                        }).then(() => {
+                            window.open(`https://api.whatsapp.com/send?phone=6281775473499&text=${paymentMessage}`, '_blank');
+                            this.resetCart();
+                        });
+                        break;
+                    
+                    case 'cod':
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Cash on Delivery',
+                            text: 'Pesanan bisa diambil setelah konfirmasi dengan metode pembayaran di tempat.',
+                            confirmButtonText: 'Konfirmasi Pesanan'
+                        }).then(() => {
+                            window.open(`https://api.whatsapp.com/send?phone=6281775473499&text=${paymentMessage}`, '_blank');
+                            this.resetCart();
+                        });
+                        break;
+                }
+            }
+
+            getPaymentMethodName(method) {
+                const methods = {
+                    'qris': 'Qris',
+                    'cod': 'Bayar ditempat'
+                };
+                return methods[method] || 'Metode Pembayaran Tidak Dikenal';
+            }
+
+            resetCart() {
+                this.items = [];
+                this.saveCart();
+                this.updateCartBadge();
+            }
+        }
+
+        // Inisialisasi MenuManager
+        const menuManager = new MenuManager();
+    </script>
+</body>
+</html>
